@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:24
 
 ARG TZ
 ENV TZ="$TZ"
@@ -25,7 +25,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   jq \
   nano \
   vim \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+  sox \
+  python3 \
+  python3-pip \
+  python3-venv \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* \
+  && ln -s /usr/bin/python3 /usr/bin/python
+
+# Install semversioner
+RUN pip3 install --break-system-packages semversioner
 
 # Ensure default node user has access to /usr/local/share
 RUN mkdir -p /usr/local/share/npm-global && \
@@ -79,7 +87,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -x
 
 # Install Claude
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} npm-check-updates
 
 
 # Copy and set up firewall script
